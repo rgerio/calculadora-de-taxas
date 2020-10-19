@@ -1,6 +1,6 @@
 import React from 'react';
 import {StyleSheet, View, Text} from 'react-native';
-simport RNPickerSelect from 'react-native-picker-select';
+import RNPickerSelect from 'react-native-picker-select';
 
 const Main: React.FC = () => {
   // const [installments, setInstallments] = useState(0);

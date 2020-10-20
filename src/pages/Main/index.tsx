@@ -2,12 +2,22 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {StyleSheet, View, Text, Switch, TouchableHighlight} from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import sumupPaymentConditions from '../../paymentConditions/sumupPaymentConditions';
+
+interface PaymentCondition {
+  label: string;
+  fee: number;
+}
 
 const Main: React.FC = () => {
-  // const [installments, setInstallments] = useState(0);
+  // Prices are multiplied by 100 to avoid decimal numbers
   const [price, setPrice] = useState(0);
   const [clientPaysValue, setClientPaysValue] = useState(0);
   const [youReceiveValue, setYouReceiveValue] = useState(0);
+  const [paymentConditions, setPaymentConditions] = useState<
+    PaymentCondition[]
+  >([]);
+  const [selectedPaymentCondition, setSelectedPaymentCondition] = useState(0);
 
   const [chargeConvenienceFee, setChargeConvenienceFee] = useState(true);
 
@@ -68,8 +78,41 @@ const Main: React.FC = () => {
   }, [clientPaysValue, moneyFormat]);
 
   const formattedYouReceiveValue = useMemo(() => {
-    return moneyFormat(youReceiveValue);
-  }, [youReceiveValue, moneyFormat]);
+    if (!paymentConditions[selectedPaymentCondition]) {
+      return 'R$ -,--';
+    }
+
+    const value = Math.floor(
+      youReceiveValue *
+        (1 - paymentConditions[selectedPaymentCondition].fee / 100),
+    );
+
+    return moneyFormat(value);
+  }, [
+    paymentConditions,
+    selectedPaymentCondition,
+    youReceiveValue,
+    moneyFormat,
+  ]);
+
+  const pikerItems = useMemo(() => {
+    const formmatedItems = paymentConditions.map((item, index) => {
+      return {
+        label: item.label,
+        value: index,
+      };
+    });
+
+    return formmatedItems;
+  }, [paymentConditions]);
+
+  useEffect(() => {
+    setPaymentConditions(sumupPaymentConditions);
+  }, []);
+
+  if (pikerItems.length === 0) {
+    return <Text>Carregando...</Text>;
+  }
 
   return (
     <View style={styles.container}>
@@ -85,15 +128,8 @@ const Main: React.FC = () => {
             doneText="Pronto"
             useNativeAndroidPickerStyle={false}
             style={pickerSelectStyles}
-            onValueChange={(value) => console.log(value)}
-            items={[
-              {label: 'Débito (1.9%)', value: '0'},
-              {label: 'Crédito - 1 parcela', value: '1'},
-              {label: 'Crédito - 2 parcela', value: '2'},
-              {label: 'Crédito - 3 parcela', value: '3'},
-              {label: 'Crédito - 4 parcela', value: '4'},
-              {label: 'Hockey', value: 'hockey'},
-            ]}
+            onValueChange={(_, index) => setSelectedPaymentCondition(index)}
+            items={pikerItems}
             Icon={() => {
               return <Icon name="arrow-drop-down" size={30} color="gray" />;
             }}
@@ -339,7 +375,7 @@ const pickerSelectStyles = StyleSheet.create({
   },
   inputAndroid: {
     fontSize: 16,
-    paddingVertical: 0,
+    paddingVertical: 4,
     paddingHorizontal: 0,
     color: 'black',
     paddingRight: 30,

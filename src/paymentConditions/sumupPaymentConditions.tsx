@@ -1,4 +1,6 @@
-const sumupPaymentConditions = [
+import PaymentCondition from './PaymentCondition';
+
+const sumupPaymentConditions: PaymentCondition[] = [
   {
     label: 'Débito',
     fee: 1.9,

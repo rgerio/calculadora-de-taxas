@@ -2,34 +2,32 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {StyleSheet, View, Text, Switch, TouchableHighlight} from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+
+import PaymentCondition from '../../paymentConditions/PaymentCondition';
 import sumupPaymentConditions from '../../paymentConditions/sumupPaymentConditions';
 
-interface PaymentCondition {
-  label: string;
-  fee: number;
-}
-
 const Main: React.FC = () => {
-  // Prices are multiplied by 100 to avoid decimal numbers
-  const [price, setPrice] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [price, setPrice] = useState(0); // Prices are multiplied by 100 to avoid decimal numbers
   const [clientPaysValue, setClientPaysValue] = useState(0);
   const [youReceiveValue, setYouReceiveValue] = useState(0);
   const [paymentConditions, setPaymentConditions] = useState<
     PaymentCondition[]
   >([]);
   const [selectedPaymentCondition, setSelectedPaymentCondition] = useState(0);
+  const [shouldChargeFee, setShouldChargeFee] = useState(true);
 
-  const [chargeConvenienceFee, setChargeConvenienceFee] = useState(true);
-
-  const toggleChargeConvenienceFee = useCallback(
-    () => setChargeConvenienceFee((previousState) => !previousState),
+  const toggleShouldChargeFee = useCallback(
+    () => setShouldChargeFee((previousState) => !previousState),
     [],
   );
 
   const handlePressKeyboard = useCallback((key: number) => {
     if (key === -1) {
+      // Erase key
       setPrice((oldValue) => Math.floor(oldValue / 10));
     } else if (key === 10) {
+      // Double zero key
       setPrice((oldValue) => {
         const newValue1 = oldValue * 10;
         if (newValue1 > 99999999) {
@@ -44,6 +42,7 @@ const Main: React.FC = () => {
         }
       });
     } else {
+      // Number key
       setPrice((oldValue) => {
         const newValue = oldValue * 10 + key;
         if (newValue > 99999999) {
@@ -54,11 +53,6 @@ const Main: React.FC = () => {
       });
     }
   }, []);
-
-  useEffect(() => {
-    setClientPaysValue(Math.floor(price * 1));
-    setYouReceiveValue(Math.floor(price * 0.988));
-  }, [price]);
 
   const moneyFormat = useCallback((value: number) => {
     const integerSlice = Math.floor(value / 100);
@@ -78,40 +72,41 @@ const Main: React.FC = () => {
   }, [clientPaysValue, moneyFormat]);
 
   const formattedYouReceiveValue = useMemo(() => {
-    if (!paymentConditions[selectedPaymentCondition]) {
-      return 'R$ -,--';
-    }
-
-    const value = Math.floor(
-      youReceiveValue *
-        (1 - paymentConditions[selectedPaymentCondition].fee / 100),
-    );
-
-    return moneyFormat(value);
-  }, [
-    paymentConditions,
-    selectedPaymentCondition,
-    youReceiveValue,
-    moneyFormat,
-  ]);
+    return moneyFormat(youReceiveValue);
+  }, [youReceiveValue, moneyFormat]);
 
   const pikerItems = useMemo(() => {
-    const formmatedItems = paymentConditions.map((item, index) => {
+    return paymentConditions.map((item, index) => {
       return {
         label: item.label,
         value: index,
       };
     });
-
-    return formmatedItems;
   }, [paymentConditions]);
 
   useEffect(() => {
+    if (!paymentConditions[selectedPaymentCondition]) {
+      return;
+    }
+
+    const fee = paymentConditions[selectedPaymentCondition].fee / 100;
+    const calculatedPrice = shouldChargeFee ? price / (1 - fee) : price;
+
+    setClientPaysValue(Math.floor(calculatedPrice));
+    setYouReceiveValue(Math.floor(calculatedPrice * (1 - fee)));
+  }, [shouldChargeFee, price, paymentConditions, selectedPaymentCondition]);
+
+  useEffect(() => {
     setPaymentConditions(sumupPaymentConditions);
+    setLoading(false);
   }, []);
 
-  if (pikerItems.length === 0) {
-    return <Text>Carregando...</Text>;
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Carregando...</Text>
+      </View>
+    );
   }
 
   return (
@@ -128,23 +123,20 @@ const Main: React.FC = () => {
             doneText="Pronto"
             useNativeAndroidPickerStyle={false}
             style={pickerSelectStyles}
-            onValueChange={(_, index) => setSelectedPaymentCondition(index)}
             items={pikerItems}
+            onValueChange={(_, index) => setSelectedPaymentCondition(index)}
             Icon={() => {
               return <Icon name="arrow-drop-down" size={30} color="gray" />;
             }}
           />
         </View>
 
-        <View style={styles.chargeConvenienceFeeContainer}>
-          <Text style={styles.chargeConvenienceFeeText}>Repassar taxa?</Text>
+        <View style={styles.shouldChargeFeeContainer}>
+          <Text style={styles.shouldChargeFeeText}>Repassar taxa?</Text>
           <Switch
-            style={styles.chargeConvenienceFeeSwitch}
-            // trackColor={{false: '#767577', true: '#81b0ff'}}
-            // thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-            // ios_backgroundColor="#3e3e3e"
-            onValueChange={toggleChargeConvenienceFee}
-            value={chargeConvenienceFee}
+            style={styles.shouldChargeFeeSwitch}
+            onValueChange={toggleShouldChargeFee}
+            value={shouldChargeFee}
           />
         </View>
 
@@ -256,7 +248,6 @@ const styles = StyleSheet.create({
   },
 
   priceContainer: {
-    // backgroundColor: '#ffccff',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
@@ -271,21 +262,18 @@ const styles = StyleSheet.create({
   },
 
   settingsContainer: {
-    // backgroundColor: '#bbbbff',
     width: '100%',
     marginTop: 16,
   },
 
   installmentsContainer: {
-    // backgroundColor: '#bbbbee',
     backgroundColor: '#fff',
     height: 64,
     justifyContent: 'center',
     padding: 16,
   },
 
-  chargeConvenienceFeeContainer: {
-    // backgroundColor: '#bbffff',
+  shouldChargeFeeContainer: {
     backgroundColor: '#fff',
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -294,10 +282,10 @@ const styles = StyleSheet.create({
     marginTop: 8,
     padding: 16,
   },
-  chargeConvenienceFeeText: {
+  shouldChargeFeeText: {
     fontSize: 16,
   },
-  chargeConvenienceFeeSwitch: {},
+  shouldChargeFeeSwitch: {},
 
   clientPaysContainer: {
     backgroundColor: '#3388ff',
@@ -368,17 +356,23 @@ const styles = StyleSheet.create({
 });
 
 const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    paddingVertical: 8,
-    paddingRight: 30,
-  },
   inputAndroid: {
     fontSize: 16,
     paddingVertical: 4,
     paddingHorizontal: 0,
     color: 'black',
     paddingRight: 30,
+  },
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 8,
+    paddingRight: 30,
+  },
+  chevronUp: {
+    display: 'none',
+  },
+  chevronDown: {
+    display: 'none',
   },
 });
 

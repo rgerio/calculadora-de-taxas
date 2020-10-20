@@ -1,6 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {StyleSheet, View, Text, Switch} from 'react-native';
-import {RectButton} from 'react-native-gesture-handler';
+import {StyleSheet, View, Text, Switch, TouchableHighlight} from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -126,75 +125,88 @@ const Main: React.FC = () => {
 
       <View style={styles.keyboardContainer}>
         <View style={styles.keyboardLine}>
-          <RectButton
+          <TouchableHighlight
+            underlayColor="#d8dde1"
             style={styles.numberContainer}
             onPress={() => handlePressKeyboard(1)}>
             <Text style={styles.numberText}>1</Text>
-          </RectButton>
-          <RectButton
+          </TouchableHighlight>
+          <TouchableHighlight
+            underlayColor="#d8dde1"
             style={styles.numberContainer}
             onPress={() => handlePressKeyboard(2)}>
             <Text style={styles.numberText}>2</Text>
-          </RectButton>
-          <RectButton
+          </TouchableHighlight>
+          <TouchableHighlight
+            underlayColor="#d8dde1"
             style={styles.numberContainer}
             onPress={() => handlePressKeyboard(3)}>
             <Text style={styles.numberText}>3</Text>
-          </RectButton>
+          </TouchableHighlight>
         </View>
 
         <View style={styles.keyboardLine}>
-          <RectButton
+          <TouchableHighlight
+            underlayColor="#d8dde1"
             style={styles.numberContainer}
             onPress={() => handlePressKeyboard(4)}>
             <Text style={styles.numberText}>4</Text>
-          </RectButton>
-          <RectButton
+          </TouchableHighlight>
+          <TouchableHighlight
+            underlayColor="#d8dde1"
             style={styles.numberContainer}
             onPress={() => handlePressKeyboard(5)}>
             <Text style={styles.numberText}>5</Text>
-          </RectButton>
-          <RectButton
+          </TouchableHighlight>
+          <TouchableHighlight
+            underlayColor="#d8dde1"
             style={styles.numberContainer}
             onPress={() => handlePressKeyboard(6)}>
             <Text style={styles.numberText}>6</Text>
-          </RectButton>
+          </TouchableHighlight>
         </View>
 
         <View style={styles.keyboardLine}>
-          <RectButton
+          <TouchableHighlight
+            underlayColor="#d8dde1"
             style={styles.numberContainer}
             onPress={() => handlePressKeyboard(7)}>
             <Text style={styles.numberText}>7</Text>
-          </RectButton>
-          <RectButton
+          </TouchableHighlight>
+          <TouchableHighlight
+            underlayColor="#d8dde1"
             style={styles.numberContainer}
             onPress={() => handlePressKeyboard(8)}>
             <Text style={styles.numberText}>8</Text>
-          </RectButton>
-          <RectButton
+          </TouchableHighlight>
+          <TouchableHighlight
+            underlayColor="#d8dde1"
             style={styles.numberContainer}
             onPress={() => handlePressKeyboard(9)}>
             <Text style={styles.numberText}>9</Text>
-          </RectButton>
+          </TouchableHighlight>
         </View>
 
         <View style={styles.keyboardLine}>
-          <RectButton
+          <TouchableHighlight
+            underlayColor="#d8dde1"
             style={styles.numberBorderlessContainer}
             onPress={() => handlePressKeyboard(10)}>
             <Text style={styles.numberText}>00</Text>
-          </RectButton>
-          <RectButton
+          </TouchableHighlight>
+          <TouchableHighlight
+            underlayColor="#d8dde1"
             style={styles.numberContainer}
             onPress={() => handlePressKeyboard(0)}>
             <Text style={styles.numberText}>0</Text>
-          </RectButton>
-          <RectButton
+          </TouchableHighlight>
+          <TouchableHighlight
+            underlayColor="#d8dde1"
             style={styles.numberBorderlessContainer}
-            onPress={() => handlePressKeyboard(-1)}>
+            onPress={() => handlePressKeyboard(-1)}
+            onLongPress={() => setPrice(0)}>
             <Icon name="backspace" size={24} color="gray" />
-          </RectButton>
+          </TouchableHighlight>
         </View>
       </View>
     </View>

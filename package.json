@@ -1,5 +1,5 @@
 {
-  "name": "calculadoraTaxas",
+  "name": "calculadoradetaxas",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -13,7 +13,6 @@
     "@react-native-community/picker": "^1.8.1",
     "react": "16.13.1",
     "react-native": "0.63.3",
-    "react-native-gesture-handler": "^1.8.0",
     "react-native-picker-select": "^8.0.2",
     "react-native-vector-icons": "^7.1.0"
   },

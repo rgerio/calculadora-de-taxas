@@ -3,12 +3,12 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 
 platform :ios, '10.0'
 
-target 'calculadoraTaxas' do
+target 'calculadoradetaxas' do
   config = use_native_modules!
 
   use_react_native!(:path => config["reactNativePath"])
 
-  target 'calculadoraTaxasTests' do
+  target 'calculadoradetaxasTests' do
     inherit! :complete
     # Pods for testing
   end
@@ -23,10 +23,10 @@ target 'calculadoraTaxas' do
   end
 end
 
-target 'calculadoraTaxas-tvOS' do
-  # Pods for calculadoraTaxas-tvOS
+target 'calculadoradetaxas-tvOS' do
+  # Pods for calculadoradetaxas-tvOS
 
-  target 'calculadoraTaxas-tvOSTests' do
+  target 'calculadoradetaxas-tvOSTests' do
     inherit! :search_paths
     # Pods for testing
   end

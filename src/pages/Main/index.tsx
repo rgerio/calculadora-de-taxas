@@ -1,5 +1,12 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {StyleSheet, View, Text, Switch, TouchableHighlight} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  Switch,
+  TouchableHighlight,
+  ScrollView,
+} from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -110,7 +117,7 @@ const Main: React.FC = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.priceContainer}>
         <Text style={styles.priceText}>{formattedPrice}</Text>
         <Text style={styles.priceDescription}>Valor da venda</Text>
@@ -237,14 +244,13 @@ const Main: React.FC = () => {
           </TouchableHighlight>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
   },
 
   priceContainer: {
